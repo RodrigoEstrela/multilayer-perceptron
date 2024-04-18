@@ -18,19 +18,25 @@ def main():
     X = scaler.fit_transform(X)
 
     # Define the network
-    network = Network([
+    networks = [Network([
         # Input layer
         Layer(shape=('input_shape', X.shape[1]), activation='relu', input_size=1),
         # Hidden layer 1
         Layer(shape=20, activation='relu', input_size=30),
+        # Hidden layer 2
+        Layer(shape=20, activation='relu', input_size=20),
+        # Hidden layer 3
+        Layer(shape=20, activation='relu', input_size=20),
         # Output layer
         Layer(shape=2, activation='softmax', input_size=20)],
         # Features and labels
         features=X, labels=y
-    )
+    ) for _ in range(5)]
 
-    network.train_loop(epochs=84)
-    print(network.evaluate())
+    for i in range(5):
+        networks[i].train_loop(epochs=1200)
+        print("Training Finished")
+        print(networks[i].evaluate())
 
 
 if __name__ == '__main__':

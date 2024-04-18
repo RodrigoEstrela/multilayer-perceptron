@@ -11,6 +11,7 @@ class Network:
         self.features = features
         self.labels = labels
         self.predictions = None
+        self.learning_rate = 0.01
 
     def feed_input(self):
         """
@@ -64,41 +65,57 @@ class Network:
         for i in range(output_layer.shape):
             node = output_layer.nodes[i]
             # Compute the delta for each node in the output layer
-            node.delta = (self.labels - self.predictions) * node.activation_derivative(node.output)
-
-    def compute_hidden_layer_delta(self):
-        """
-        Compute the delta of the hidden layers
-        """
-        current_layer = self.layers[1]
-        next_layer = self.layers[2]
-        for j in range(current_layer.shape):
-            node = current_layer.nodes[j]
-            # Compute the delta for each node in the hidden layer
-            node.delta = np.dot(next_layer.nodes[j].weights, next_layer.nodes[j].delta) * node.activation_derivative(
-                node.output)
+            node.delta = (self.predictions - self.labels) * node.activation_derivative(node.output)
 
     def update_output_layer_weights(self):
         """
         Update the weights of the output layer
         """
-        learning_rate = 0.0314
-        output_layer = self.layers[2]
-        hidden_layer = self.layers[1]
+        output_layer = self.layers[-1]
+        hidden_layer = self.layers[-2]
         for i in range(output_layer.shape):
             node = output_layer.nodes[i]
             # Update the weights for each node in the output layer
-            node.weights -= learning_rate * node.delta @ hidden_layer.nodes[i].output
+            transposed_hidden_outputs = np.array([hidden_node.output for hidden_node in hidden_layer.nodes]).T
+            node.weights -= self.learning_rate * node.delta @ transposed_hidden_outputs
+
+    def compute_hidden_layers_delta(self):
+        """
+        Compute the delta of the hidden layers
+        """
+        for i in range(len(self.layers) - 2, 0, -1):
+            hidden_layer = self.layers[i]
+            next_layer = self.layers[i + 1]
+            for j in range(hidden_layer.shape):
+                node = hidden_layer.nodes[j]
+                # Compute the delta for each node in the hidden layer
+                node.delta = sum([next_node.weights[j] * next_node.delta for next_node in
+                                  next_layer.nodes]) * node.activation_derivative(node.output)
+
+    def update_hidden_layers_weights(self):
+        """
+        Update the weights of the hidden layers
+        """
+        for i in range(len(self.layers) - 2, 0, -1):
+            hidden_layer = self.layers[i]
+            previous_layer = self.layers[i - 1]
+            for j in range(hidden_layer.shape):
+                node = hidden_layer.nodes[j]
+                # Update the weights for each node in the hidden layer
+                transposed_previous_outputs = np.array([previous_node.output for previous_node in previous_layer.nodes]).T
+                node.weights -= self.learning_rate * node.delta @ transposed_previous_outputs
 
     def train_loop(self, epochs: int):
+        print("Begin Training")
         for i in range(epochs):
-            if i == 1:
+            if i % 50 == 0:
                 print(self.evaluate())
             self.feedforward()
-            self.compute_cost()
+            # self.compute_cost()
             self.compute_output_layer_delta()
             self.compute_hidden_layers_delta()
             self.update_output_layer_weights()
+            self.update_hidden_layers_weights()
 
     def evaluate(self):
         """
