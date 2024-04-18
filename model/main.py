@@ -23,14 +23,13 @@ def main():
         Layer(shape=('input_shape', X.shape[1]), activation='relu', input_size=1),
         # Hidden layer 1
         Layer(shape=20, activation='relu', input_size=30),
-        # Hidden layer 2
-        Layer(shape=20, activation='relu', input_size=20),
         # Output layer
         Layer(shape=2, activation='softmax', input_size=20)],
         # Features and labels
         features=X, labels=y
     )
 
+    network.train_loop(epochs=84)
     print(network.evaluate())
 
 
