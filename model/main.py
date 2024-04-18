@@ -17,8 +17,11 @@ class Node:
     Node class valid for input, hidden and output nodes
     """
 
-    def __init__(self, inputs: int, activation):
-        self.weights = he_initialization(inputs)
+    def __init__(self, shape: int | str, activation, features_size):
+        if isinstance(shape, str):
+            self.weights = np.ones(features_size)
+        else:
+            self.weights = he_initialization(shape)
         self.activation_function = activation
 
     def activation(self, x):
@@ -45,8 +48,11 @@ class Layer:
     Layer class valid for input, hidden and output layers
     """
 
-    def __init__(self, shape: str | int, activation: str):
-        self.nodes = [Node(shape, activation) for _ in range(shape)]
+    def __init__(self, shape: str | int, activation: str, size=0):
+        if isinstance(shape, str):
+            self.nodes = [Node(shape, activation, size) for _ in range(size)]
+        else:
+            self.nodes = [Node(shape, activation, size) for _ in range(shape)]
 
     def __str__(self):
         # Print each one of the nodes of the layer
@@ -59,19 +65,43 @@ class Network:
     multilayer-perceptron model
     """
 
-    def __init__(self, layers):
+    def __init__(self, layers, features, labels):
         self.layers = layers
+        self.features = features
+        self.labels = labels
 
-    def feedforward(self, X):
+    def feedforward(self):
         """
         Forward pass through the network
         """
+        X = self.features
         for layer in self.layers:
-            # Run activation function for each node in the layer
-            layer_output = np.array([node.activation(node.weights @ X) for node in layer.nodes])
+            # Initialize list to store layer outputs
+            layer_outputs = []
+            # Iterate over nodes in the layer
+            for node in layer.nodes:
+                # Transpose weights matrix before multiplying with inputs
+                # print(node.weights.shape, X.shape)
+                weighted_sum = node.weights @ X.T
+                # Apply activation function
+                activation_output = node.activation(weighted_sum)
+                # Append output to layer_outputs
+                print(activation_output.shape)
+                layer_outputs.append(activation_output)
             # Set the output of the layer as the input of the next layer
-            X = layer_output
+            print(X.shape)
+            X = np.array(layer_outputs)
+            print(X.shape)
         return X
+
+    def predict(self):
+        """
+        Predict the class of each sample
+        """
+        # Get the output of the last layer
+        output = self.feedforward()
+        # Return the index of the node with the highest value
+        return np.argmax(output, axis=0)
 
     def __str__(self):
         # Print each one of the layers of the network
@@ -91,14 +121,16 @@ def main():
     # Define the network
     network = Network([
         # Input layer
-        Layer(shape=X.shape[1], activation='relu'),
+        Layer(shape='input_shape', activation='relu', size=X.shape[1]),
         # Hidden layer 1
         Layer(shape=20, activation='relu'),
         # Output layer
-        Layer(shape=2, activation='softmax')
-    ])
+        Layer(shape=2, activation='softmax')],
+        # Features and labels
+        features=X, labels=y
+    )
 
-    print(network)
+    print(network.feedforward())
 
 
 if __name__ == '__main__':
