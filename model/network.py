@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 class Network:
     """
@@ -12,6 +12,7 @@ class Network:
         self.labels = labels
         self.predictions = None
         self.learning_rate = 0.01
+        self.iterations = []
 
     def feed_input(self):
         """
@@ -54,8 +55,11 @@ class Network:
         Function to compute the cost of the network using the following formula:
         (y - ŷ)^2 / 2
         """
-        cost = ((self.labels - self.predictions) ** 2) / 2
-        # print(cost)
+        n = len(self.labels)
+        cost = np.sum((self.labels - self.predictions) ** 2) / n
+
+        return cost
+        
 
     def compute_output_layer_delta(self):
         """
@@ -78,6 +82,7 @@ class Network:
             # Update the weights for each node in the output layer
             transposed_hidden_outputs = np.array([hidden_node.output for hidden_node in hidden_layer.nodes]).T
             node.weights -= self.learning_rate * node.delta @ transposed_hidden_outputs
+            node.weights = [0 if weight < 0 else weight for weight in node.weights]
 
     def compute_hidden_layers_delta(self):
         """
@@ -104,14 +109,18 @@ class Network:
                 # Update the weights for each node in the hidden layer
                 transposed_previous_outputs = np.array([previous_node.output for previous_node in previous_layer.nodes]).T
                 node.weights -= self.learning_rate * node.delta @ transposed_previous_outputs
+                node.weights = [0 if weight < 0 else weight for weight in node.weights]
 
-    def train_loop(self, epochs: int):
+
+    def fit(self, epochs: int, learning_rate: int):
+        self.learning_rate = learning_rate
+        self.iterations : np.array
         print("Begin Training")
         for i in range(epochs):
-            if i % 50 == 0:
+            if i  == 1:
                 print(self.evaluate())
             self.feedforward()
-            # self.compute_cost()
+            self.iterations.append((i, self.compute_cost()))
             self.compute_output_layer_delta()
             self.compute_hidden_layers_delta()
             self.update_output_layer_weights()
@@ -124,6 +133,21 @@ class Network:
         # Compare the predicted classes with the true classes
         accuracy = np.mean(self.predictions == self.labels)
         return accuracy
+    
+    def plot_cost(self):
+        """
+        Plot the cost evaluation
+        """
+        x = [item[0] for item in self.iterations]
+        y = [item[1] for item in self.iterations]
+
+        # Plot the data as a scatter graph
+        plt.scatter(x, y)
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.title('Cost evaluation')
+        plt.grid(True)
+        plt.show()
 
     def __str__(self):
         # Print each one of the layers of the network
