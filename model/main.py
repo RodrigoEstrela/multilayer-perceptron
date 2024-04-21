@@ -19,20 +19,20 @@ def main():
 
     network = Network([
         # Input layer
-        Layer(shape=('input_shape', X.shape[1]), activation='relu', input_size=1),
+        Layer(shape=('input_shape', X.shape[1]), activation='sigmoid', input_size=1),
         # Hidden layer 1
         Layer(shape=24, activation='relu', input_size=30),
         # Hidden layer 2
         Layer(shape=24, activation='relu', input_size=24),
         # # Hidden layer 3
-        # Layer(shape=24, activation='relu', input_size=24),
+        Layer(shape=24, activation='relu', input_size=24),
         # Output layer
         Layer(shape=2, activation='softmax', input_size=24)],
         # Features and labels
         features=X, labels=y
     )
 
-    network.fit(epochs=100, learning_rate=0.014)
+    network.fit(epochs=100, learning_rate=0.1042)
     print("Training Finished")
     print(network.evaluate())
 

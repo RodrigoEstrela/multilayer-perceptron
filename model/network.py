@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class Network:
     """
     multilayer-perceptron model
@@ -38,7 +39,7 @@ class Network:
             for node in self.layers[i].nodes:
                 # Transpose weights matrix before multiplying with inputs
                 # print(node.weights.shape, X.shape)
-                weighted_sum = node.weights @ X
+                weighted_sum = node.weights @ X + node.bias
                 # Apply activation function
                 activation_output = node.activation(weighted_sum)
                 # Append output to layer_outputs
@@ -59,7 +60,6 @@ class Network:
         cost = np.sum((self.labels - self.predictions) ** 2) / n
 
         return cost
-        
 
     def compute_output_layer_delta(self):
         """
@@ -83,6 +83,7 @@ class Network:
             transposed_hidden_outputs = np.array([hidden_node.output for hidden_node in hidden_layer.nodes]).T
             node.weights -= self.learning_rate * node.delta @ transposed_hidden_outputs
             node.weights = [0 if weight < 0 else weight for weight in node.weights]
+            node.bias -= self.learning_rate * node.delta
 
     def compute_hidden_layers_delta(self):
         """
@@ -110,9 +111,9 @@ class Network:
                 transposed_previous_outputs = np.array([previous_node.output for previous_node in previous_layer.nodes]).T
                 node.weights -= self.learning_rate * node.delta @ transposed_previous_outputs
                 node.weights = [0 if weight < 0 else weight for weight in node.weights]
+                node.bias -= self.learning_rate * node.delta
 
-
-    def fit(self, epochs: int, learning_rate: int):
+    def fit(self, epochs: int, learning_rate: float):
         self.learning_rate = learning_rate
         self.iterations : np.array
         print("Begin Training")

@@ -23,6 +23,7 @@ class Node:
             self.weights = he_initialization(input_size)
             self.delta = np.zeros(shape)
         self.activation_function = activation
+        self.bias = 0
 
     def activation(self, x):
         """
