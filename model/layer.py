@@ -6,15 +6,20 @@ class Layer:
     Layer class valid for input, hidden and output layers
     """
 
-    def __init__(self, n_input_nodes: int = None, n_current_layer_nodes: int = None,  activation: str = None, name: str = None):
+    def __init__(self, n_input_nodes: int = None, n_current_layer_nodes: int = None,
+                 activation: str = None, name: str = None,
+                 weights: np.ndarray = None, bias: np.ndarray = None):
         self.activation_function = activation
         self.name = name
 
         self.n_input_nodes = n_input_nodes
         self.n_output_nodes = n_current_layer_nodes
 
-        # Initialize weights only if the layer is not the input layer
-        if n_input_nodes is not None:
+        # Initialize weights and bias
+        if weights is not None:
+            self.weights = weights
+            self.bias = bias
+        elif n_input_nodes is not None:
             self.weights = np.random.randn(n_input_nodes, n_current_layer_nodes) * np.sqrt(2 / n_input_nodes)
             self.bias = np.random.uniform(-1, 1, (1, n_current_layer_nodes))
         else:
