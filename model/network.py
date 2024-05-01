@@ -19,13 +19,17 @@ class Network:
         self.predictions = None
         self.learning_rate = 0.01
         self.iterations = []
+        self.gradients = []
 
-    def feedforward(self, input_data):
+    def feedforward(self, input_data=None):
         """
         Feedforward the input data through the network
         """
         # Set the output of the input layer to the input features
-        self.layers[0].output = input_data
+        if input_data is not None:
+            self.layers[0].output = input_data
+        else:
+            self.layers[0].output = self.features_train
         # Iterate over each layer (starting from the second layer)
         for i in range(1, len(self.layers)):
             # Compute the weighted sum of inputs for each node in the current layer
@@ -37,29 +41,29 @@ class Network:
             # Store the outputs of the current layer
             self.layers[i].output = outputs
 
-        # Return the output of the last layer
-        return self.layers[-1].output
+        # Save the output of the last layer as the predictions
+        self.predictions = self.layers[-1].output
 
-    def calculate_loss(self):
+    def calculate_loss(self, iteration: int):
         """
         Calculate the loss (error) of the current predictions
         """
         # Perform forward pass to get predictions
-        predictions = self.feedforward(self.features_train)
+        self.feedforward()
 
         # Compute the cross-entropy loss
-        loss = -np.mean(np.log(predictions[np.arange(len(predictions)), self.labels_train]))
+        loss = -np.mean(np.log(self.predictions[np.arange(len(self.predictions)), self.labels_train]))
 
-        return loss
+        self.iterations.append((iteration, loss))
 
-    def backpropagation(self, predictions, labels):
+    def backpropagation(self):
         """
         Backpropagation algorithm to compute the gradients of the loss with respect to the weights and biases
         """
         # Compute the error of the output layer
-        error = predictions
-        error[np.arange(len(predictions)), labels] -= 1
-        error /= len(predictions)
+        error = self.predictions
+        error[np.arange(len(self.predictions)), self.labels_train] -= 1
+        error /= len(self.predictions)
 
         # Initialize the list of gradients
         gradients = []
@@ -78,16 +82,16 @@ class Network:
         # Reverse the list of gradients to match the order of the layers
         gradients.reverse()
 
-        return gradients
+        self.gradients = gradients
 
-    def update_weights(self, gradients):
+    def update_weights(self):
         """
         Update the weights and biases of the network using the computed gradients
         """
         for i in range(1, len(self.layers)):
             # Update the weights and biases of the current layer
-            self.layers[i].weights -= self.learning_rate * gradients[i - 1][0]
-            self.layers[i].bias -= self.learning_rate * gradients[i - 1][1]
+            self.layers[i].weights -= self.learning_rate * self.gradients[i - 1][0]
+            self.layers[i].bias -= self.learning_rate * self.gradients[i - 1][1]
 
     def fit(self, epochs: int, learning_rate: float):
         """
@@ -95,15 +99,25 @@ class Network:
         """
         self.learning_rate = learning_rate
         for i in range(epochs):
-            # feedforward
-            self.predictions = self.feedforward(self.features_train)
-            # calculate loss
-            loss = self.calculate_loss()
-            self.iterations.append((i, loss))
-            # backpropagation
-            gradients = self.backpropagation(self.predictions, self.labels_train)
-            # update weights
-            self.update_weights(gradients)
+            self.feedforward()
+            self.calculate_loss(i)
+            self.backpropagation()
+            self.update_weights()
+
+        print(f"Training completed. Loss: {self.iterations[-1][1]:.2f}.")
+
+    def evaluate(self, input_data, labels):
+        """
+        Evaluate the accuracy of the model on the given input data and labels
+        """
+
+        # Perform prediction on the input data
+        self.feedforward(input_data)
+        predictions = np.argmax(self.predictions, axis=1)
+        # Compute the accuracy of the model
+        accuracy = np.mean(predictions == labels)
+        # Print the accuracy
+        print(f"Accuracy: {accuracy:.2f}.")
 
     def plot_cost(self):
         """
@@ -134,6 +148,8 @@ class Network:
             np.save(weights_filename, layer.weights)
             np.save(bias_filename, layer.bias)
 
+        print("Model saved.")
+
     @staticmethod
     def load_model(num_layers):
         """
@@ -153,4 +169,6 @@ class Network:
                 weights = np.load(weights_filename)
                 bias = np.load(bias_filename)
                 layers.append(Layer(weights=weights, bias=bias, activation='relu'))
+
+        print("Model loaded.")
         return Network(layers=layers)

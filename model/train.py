@@ -42,10 +42,8 @@ def main():
 
         # Train the network
         network.fit(epochs=1000, learning_rate=0.01)
-        print("Training Phase - Completed.")
         # Save the model
         network.save_model()
-        print("Model saved to [model_save] directory.")
         # Plot the cost evolution
         network.plot_cost()
 
