@@ -10,8 +10,10 @@ from network import Network
 
 def main():
     # make directory model_save
-    if not os.path.exists('model_save'):
-        os.makedirs('model_save')
+    this_file_path = os.path.dirname(os.path.realpath(__file__))
+    save_model_path = os.path.join(this_file_path, '..', 'model_save')
+    if not os.path.exists(save_model_path):
+        os.makedirs(save_model_path)
     try:
         # Get path for training dataset
         this_file_path = os.path.dirname(os.path.realpath(__file__))
@@ -25,7 +27,9 @@ def main():
         scaler = MinMaxScaler(copy=False)
         X = scaler.fit_transform(X)
         # Save the scaler
-        joblib.dump(scaler, 'model_save/scaler.pkl')
+        this_file_path = os.path.dirname(os.path.realpath(__file__))
+        save_model_path = os.path.join(this_file_path, '..', 'model_save')
+        joblib.dump(scaler, save_model_path + '/scaler.pkl')
         # Create the network
         network = Network([
             # Input layer

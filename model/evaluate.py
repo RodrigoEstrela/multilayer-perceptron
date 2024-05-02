@@ -18,7 +18,9 @@ def main():
         X_evaluate = evaluate_data.iloc[:, 2:32]
         X_evaluate = np.nan_to_num(X_evaluate)
         # Load the scaler
-        scaler = joblib.load('model_save/scaler.pkl')
+        this_file_path = os.path.dirname(os.path.realpath(__file__))
+        save_model_path = os.path.join(this_file_path, '..', 'model_save')
+        scaler = joblib.load(save_model_path + '/scaler.pkl')
         X_evaluate = scaler.transform(X_evaluate)
         # Load the model
         trained_model = Network.load_model(num_layers=5)

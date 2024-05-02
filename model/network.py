@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 from layer import Layer
 
@@ -20,6 +21,7 @@ class Network:
         self.learning_rate = 0.01
         self.iterations = []
         self.gradients = []
+        self.save_model_path = None
 
     def feedforward(self, input_data=None):
         """
@@ -138,13 +140,15 @@ class Network:
         """
         Save the model weights and biases to files
         """
+        this_file_path = os.path.dirname(os.path.realpath(__file__))
+        self.save_model_path = os.path.join(this_file_path, '..', 'model_save')
         for i, layer in enumerate(self.layers[1:], start=1):
             if i == len(self.layers) - 1:  # output layer
-                weights_filename = f"model_save/mlp_output_layer_weights.npy"
-                bias_filename = f"model_save/mlp_output_layer_bias.npy"
+                weights_filename = self.save_model_path + f"/mlp_output_layer_weights.npy"
+                bias_filename = self.save_model_path + f"/mlp_output_layer_bias.npy"
             else:  # hidden layers
-                weights_filename = f"model_save/mlp_hidden_layer_{i}_weights.npy"
-                bias_filename = f"model_save/mlp_hidden_layer_{i}_bias.npy"
+                weights_filename = self.save_model_path + f"/mlp_hidden_layer_{i}_weights.npy"
+                bias_filename = self.save_model_path + f"/mlp_hidden_layer_{i}_bias.npy"
             np.save(weights_filename, layer.weights)
             np.save(bias_filename, layer.bias)
 
@@ -155,17 +159,19 @@ class Network:
         """
         Load the model weights and biases from files
         """
+        this_file_path = os.path.dirname(os.path.realpath(__file__))
+        save_model_path = os.path.join(this_file_path, '..', 'model_save')
         layers = [Layer(name="input")]
         for i in range(1, num_layers):
             if i == num_layers - 1:  # output layer
-                weights_filename = f"model_save/mlp_output_layer_weights.npy"
-                bias_filename = f"model_save/mlp_output_layer_bias.npy"
+                weights_filename = save_model_path + f"/mlp_output_layer_weights.npy"
+                bias_filename = save_model_path + f"/mlp_output_layer_bias.npy"
                 weights = np.load(weights_filename)
                 bias = np.load(bias_filename)
                 layers.append(Layer(weights=weights, bias=bias, activation='softmax'))
             else:  # hidden layers
-                weights_filename = f"model_save/mlp_hidden_layer_{i}_weights.npy"
-                bias_filename = f"model_save/mlp_hidden_layer_{i}_bias.npy"
+                weights_filename = save_model_path + f"/mlp_hidden_layer_{i}_weights.npy"
+                bias_filename = save_model_path + f"/mlp_hidden_layer_{i}_bias.npy"
                 weights = np.load(weights_filename)
                 bias = np.load(bias_filename)
                 layers.append(Layer(weights=weights, bias=bias, activation='relu'))
