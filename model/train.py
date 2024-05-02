@@ -6,6 +6,7 @@ import joblib
 
 from layer import Layer
 from network import Network
+from mlp_parser import network_from_cli
 
 
 def main():
@@ -30,22 +31,24 @@ def main():
         this_file_path = os.path.dirname(os.path.realpath(__file__))
         save_model_path = os.path.join(this_file_path, '..', 'model_save')
         joblib.dump(scaler, save_model_path + '/scaler.pkl')
+        # Decide whether to build the model from CLI arguments or not
+        if network_from_cli(features=X, labels=y):
+            return
         # Create the network
         network = Network([
             # Input layer
-            Layer(name="input"),
+            Layer(),
             # Hidden layer 1
-            Layer(n_input_nodes=30, n_current_layer_nodes=100, activation='relu', name="hidden1"),
+            Layer(n_input_nodes=30, n_current_layer_nodes=100, activation='relu'),
             # Hidden layer 2
-            Layer(n_input_nodes=100, n_current_layer_nodes=200, activation='relu', name="hidden2"),
+            Layer(n_input_nodes=100, n_current_layer_nodes=200, activation='relu'),
             # Hidden layer 3
-            Layer(n_input_nodes=200, n_current_layer_nodes=100, activation='relu', name="hidden3"),
+            Layer(n_input_nodes=200, n_current_layer_nodes=100, activation='relu'),
             # Output layer
-            Layer(n_input_nodes=100, n_current_layer_nodes=2, activation='softmax', name="output")],
+            Layer(n_input_nodes=100, n_current_layer_nodes=2, activation='softmax')],
             # Features and labels
             features=X, labels=y
         )
-
         # Train the network
         network.fit(epochs=1000, learning_rate=0.01)
         # Save the model
@@ -57,5 +60,5 @@ def main():
         print(e)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': 
     main()

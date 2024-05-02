@@ -23,8 +23,8 @@ class Layer:
             self.weights = np.random.randn(n_input_nodes, n_current_layer_nodes) * np.sqrt(2 / n_input_nodes)
             self.bias = np.random.uniform(-1, 1, (1, n_current_layer_nodes))
         else:
-            self.weights = None
-            self.bias = None
+            self.weights = np.array([])
+            self.bias = np.array([])
 
         self.output = None
 
@@ -64,3 +64,21 @@ class Layer:
             return x * (1 - x)
         else:
             raise ValueError('Activation function not supported')
+
+    @staticmethod
+    def add_layer(type: str, n_input=None, n_nodes=None):
+        if type == 'input':
+            return Layer(n_current_layer_nodes=30)
+        elif type == 'hidden':
+            return Layer(n_input_nodes=n_input, 
+                         n_current_layer_nodes=n_nodes,
+                         activation='relu')
+        elif type == 'output':
+            return Layer(n_input_nodes=n_input, 
+                         n_current_layer_nodes=2, 
+                         activation='softmax')
+
+    def __str__(self) -> str:
+        return f"Layer: {self.name}\nActivation: {self.activation_function}\n" \
+               f"Input nodes: {self.n_input_nodes}\nOutput nodes: {self.n_output_nodes}\n" \
+               f"Weights shape: {self.weights.shape}\nBias shape: {self.bias.shape}\n"

@@ -95,7 +95,7 @@ class Network:
             self.layers[i].weights -= self.learning_rate * self.gradients[i - 1][0]
             self.layers[i].bias -= self.learning_rate * self.gradients[i - 1][1]
 
-    def fit(self, epochs: int, learning_rate: float):
+    def fit(self, epochs: int = 1000, learning_rate: float = 0.01):
         """
         Train the network using the given features and labels
         """
