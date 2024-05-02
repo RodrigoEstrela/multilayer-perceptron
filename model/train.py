@@ -1,5 +1,4 @@
 import os
-import sys
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
@@ -14,8 +13,11 @@ def main():
     if not os.path.exists('model_save'):
         os.makedirs('model_save')
     try:
+        # Get path for training dataset
+        this_file_path = os.path.dirname(os.path.realpath(__file__))
+        dataset_path = os.path.join(this_file_path, '..', 'data', 'train.csv')
         # Training data preprocessing
-        df = pd.read_csv(sys.argv[1])
+        df = pd.read_csv(dataset_path)
         y = df.iloc[:, 1]
         y = np.array([0 if label == 'M' else 1 for label in y])
         X = df.iloc[:, 2:32]
