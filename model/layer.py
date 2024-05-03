@@ -6,22 +6,32 @@ class Layer:
     Layer class valid for input, hidden and output layers
     """
 
-    def __init__(self, n_input_nodes: int = None, n_current_layer_nodes: int = None,
+    def __init__(self, n_input_nodes: int = None, n_nodes: int = None,
                  activation: str = None, name: str = None,
                  weights: np.ndarray = None, bias: np.ndarray = None):
+        # Check if the number of nodes in each layer is greater than 0 and less than 300
+        if n_nodes is not None and (n_nodes <= 0 or n_nodes > 300):
+            raise ValueError("Number of nodes in each layer must be greater than 0 and less than 300.")
+        # Check if the number of input nodes is greater than 0 and less than 300
+        if n_input_nodes is not None and (n_input_nodes <= 0 or n_input_nodes > 300):
+            raise ValueError("Number of input nodes must be greater than 0 and less than 300.")
+        # Check if the number of epochs is greater than 0
+        if n_input_nodes is not None and n_nodes is not None and n_input_nodes == n_nodes:
+            raise ValueError("Number of input nodes and number of nodes in the layer must be different.")
+        
         self.activation_function = activation
         self.name = name
 
         self.n_input_nodes = n_input_nodes
-        self.n_output_nodes = n_current_layer_nodes
+        self.n_nodes = n_nodes
 
         # Initialize weights and bias
         if weights is not None:
             self.weights = weights
             self.bias = bias
         elif n_input_nodes is not None:
-            self.weights = np.random.randn(n_input_nodes, n_current_layer_nodes) * np.sqrt(2 / n_input_nodes)
-            self.bias = np.random.uniform(-1, 1, (1, n_current_layer_nodes))
+            self.weights = np.random.randn(n_input_nodes, n_nodes) * np.sqrt(2 / n_input_nodes)
+            self.bias = np.random.uniform(-1, 1, (1, n_nodes))
         else:
             self.weights = np.array([])
             self.bias = np.array([])
@@ -66,19 +76,15 @@ class Layer:
             raise ValueError('Activation function not supported')
 
     @staticmethod
-    def add_layer(type: str, n_input=None, n_nodes=None):
+    def add_layer(type: str = None, n_input=None, n_nodes=None):
         if type == 'input':
-            return Layer(n_current_layer_nodes=30)
-        elif type == 'hidden':
-            return Layer(n_input_nodes=n_input, 
-                         n_current_layer_nodes=n_nodes,
-                         activation='relu')
+            return Layer(n_nodes=30)
         elif type == 'output':
-            return Layer(n_input_nodes=n_input, 
-                         n_current_layer_nodes=2, 
-                         activation='softmax')
+            return Layer(n_input_nodes=n_input, n_nodes=2, activation='softmax')
+        else:
+            return Layer(n_input_nodes=n_input, n_nodes=n_nodes, activation='relu')
 
     def __str__(self) -> str:
         return f"Layer: {self.name}\nActivation: {self.activation_function}\n" \
-               f"Input nodes: {self.n_input_nodes}\nOutput nodes: {self.n_output_nodes}\n" \
+               f"Input nodes: {self.n_input_nodes}\nLayer n_nodes: {self.n_nodes}\n" \
                f"Weights shape: {self.weights.shape}\nBias shape: {self.bias.shape}\n"

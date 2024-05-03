@@ -99,6 +99,11 @@ class Network:
         """
         Train the network using the given features and labels
         """
+        # Check if number of epochs and learning rate are greater than 0
+        if epochs <= 0:
+            raise ValueError("Number of epochs must be greater than 0.")
+        if learning_rate <= 0:
+            raise ValueError("Learning rate must be greater than 0.")
         self.learning_rate = learning_rate
         for i in range(epochs):
             self.feedforward()

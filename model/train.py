@@ -38,17 +38,18 @@ def main():
         network = Network([
             # Input layer
             Layer(),
-            # Hidden layer 1
-            Layer(n_input_nodes=30, n_current_layer_nodes=100, activation='relu'),
-            # Hidden layer 2
-            Layer(n_input_nodes=100, n_current_layer_nodes=200, activation='relu'),
-            # Hidden layer 3
-            Layer(n_input_nodes=200, n_current_layer_nodes=100, activation='relu'),
+            # Hidden layers
+            Layer(n_input_nodes=30, n_nodes=100, activation='relu'),
+            Layer(n_input_nodes=100, n_nodes=200, activation='relu'),
+            Layer(n_input_nodes=200, n_nodes=100, activation='relu'),
             # Output layer
-            Layer(n_input_nodes=100, n_current_layer_nodes=2, activation='softmax')],
+            Layer(n_input_nodes=100, n_nodes=2, activation='softmax')],
             # Features and labels
             features=X, labels=y
         )
+        # Check if there are at least 2 hidden layers
+        if len(network.layers) < 4:
+            raise ValueError("At least 2 hidden layers are required.")
         # Train the network
         network.fit(epochs=1000, learning_rate=0.01)
         # Save the model
