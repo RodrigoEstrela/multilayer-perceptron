@@ -12,8 +12,8 @@ def spliter(path):
 	y = df.iloc[:, 1]
 	 
 	# Split the dataset
-	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.42, random_state=42)
-	print(f'train size {len(X_train)} test size {len(X_test)}')
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.35, random_state=42)
+	print(f'train size {len(X_train)}\ntest size {len(X_test)}')
 
 	# Save train and test files
 	pd.concat([pd.concat([y_train, X_train], axis=1)]).to_csv('train.csv', header=None)
