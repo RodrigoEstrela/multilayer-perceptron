@@ -15,9 +15,6 @@ class Layer:
         # Check if the number of input nodes is greater than 0 and less than 300
         if n_input_nodes is not None and (n_input_nodes <= 0 or n_input_nodes > 300):
             raise ValueError("Number of input nodes must be greater than 0 and less than 300.")
-        # Check if the number of epochs is greater than 0
-        if n_input_nodes is not None and n_nodes is not None and n_input_nodes == n_nodes:
-            raise ValueError("Number of input nodes and number of nodes in the layer must be different.")
         
         self.activation_function = activation
         self.name = name

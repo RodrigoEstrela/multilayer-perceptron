@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import os
 
 from layer import Layer
+from args_parser import parser_function
 
 
 class Network:
@@ -22,6 +23,8 @@ class Network:
         self.iterations = []
         self.gradients = []
         self.save_model_path = None
+        self.epochs = None
+        self.show_epochs = parser_function().show_epochs
 
     def feedforward(self, input_data=None):
         """
@@ -57,6 +60,12 @@ class Network:
         loss = -np.mean(np.log(self.predictions[np.arange(len(self.predictions)), self.labels_train]))
 
         self.iterations.append((iteration, loss))
+        # print the loss for each epoch, if epoch x < 10, print 0x instead of x, otherwise print x
+        if self.show_epochs:
+            if iteration < 9:
+                print(f"epoch 0{iteration + 1}/{self.epochs} - loss: {loss:.2f}")
+            else:
+                print(f"epoch {iteration + 1}/{self.epochs} - loss: {loss:.2f}")
 
     def backpropagation(self):
         """
@@ -99,19 +108,24 @@ class Network:
         """
         Train the network using the given features and labels
         """
+        args = parser_function()
         # Check if number of epochs and learning rate are greater than 0
         if epochs <= 0:
             raise ValueError("Number of epochs must be greater than 0.")
         if learning_rate <= 0:
             raise ValueError("Learning rate must be greater than 0.")
+
+        self.epochs = epochs
         self.learning_rate = learning_rate
+        # print the shape of the features
+        print(f"Training on {self.features_train.shape[0]} samples with {self.features_train.shape[1]} features.")
         for i in range(epochs):
             self.feedforward()
             self.calculate_loss(i)
             self.backpropagation()
             self.update_weights()
 
-        print(f"Training completed. Loss: {self.iterations[-1][1]:.2f}.")
+        print(f"Training completed. Loss: {self.iterations[-1][1]:.2f}")
 
     def evaluate(self, input_data, labels):
         """

@@ -1,17 +1,6 @@
-import argparse
-
 from network import Network
 from layer import Layer
-
-
-def parser_function():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--layer', nargs='+', type=int, help='Layer(s) size(s)')
-    parser.add_argument('--epochs', nargs=1, type=int, help='Number of Epochs')
-    parser.add_argument('--learning_rate', nargs=1, type=float, help='Learning Rate')
-
-    args = parser.parse_args()
-    return args
+from args_parser import parser_function
 
 
 def network_from_cli(features=None, labels=None):
@@ -45,12 +34,14 @@ def network_from_cli(features=None, labels=None):
         network = Network(layers, features=features, labels=labels)
         network.fit(epochs=args.epochs[0], learning_rate=args.learning_rate[0])
 
-        # Save the model and plot the cost evolution
+        # Save the model
         network.save_model()
-        network.plot_cost()
+        # Plot the cost evolution
+        if args.plot_cost:
+            network.plot_cost()
 
         return True
     
     else:
-        print("Insufficient arguments passed. Building default network.")
+        print("Network from CLI arguments not found. Building network from file.")
         return False

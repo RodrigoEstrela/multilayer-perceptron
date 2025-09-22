@@ -6,7 +6,8 @@ import joblib
 
 from layer import Layer
 from network import Network
-from mlp_parser import network_from_cli
+from network_from_cli import network_from_cli
+from args_parser import parser_function
 
 
 def main():
@@ -39,11 +40,11 @@ def main():
             # Input layer
             Layer(),
             # Hidden layers
-            Layer(n_input_nodes=30, n_nodes=100, activation='relu'),
-            Layer(n_input_nodes=100, n_nodes=200, activation='relu'),
-            Layer(n_input_nodes=200, n_nodes=100, activation='relu'),
+            Layer(n_input_nodes=30, n_nodes=24, activation='relu'),
+            Layer(n_input_nodes=24, n_nodes=24, activation='relu'),
+            Layer(n_input_nodes=24, n_nodes=24, activation='relu'),
             # Output layer
-            Layer(n_input_nodes=100, n_nodes=2, activation='softmax')],
+            Layer(n_input_nodes=24, n_nodes=2, activation='softmax')],
             # Features and labels
             features=X, labels=y
         )
@@ -51,11 +52,12 @@ def main():
         if len(network.layers) < 4:
             raise ValueError("At least 2 hidden layers are required.")
         # Train the network
-        network.fit(epochs=1000, learning_rate=0.01)
+        network.fit(epochs=84, learning_rate=0.0314)
         # Save the model
         network.save_model()
         # Plot the cost evolution
-        network.plot_cost()
+        if parser_function().plot_cost:
+            network.plot_cost()
 
     except Exception as e:
         print(e)
