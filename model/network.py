@@ -25,6 +25,7 @@ class Network:
         self.save_model_path = None
         self.epochs = None
         self.show_epochs = parser_function().show_epochs
+        
 
     def feedforward(self, input_data=None):
         """
