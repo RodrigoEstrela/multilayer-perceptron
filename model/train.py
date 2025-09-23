@@ -16,6 +16,17 @@ def main():
     save_model_path = os.path.join(this_file_path, '..', 'model_save')
     if not os.path.exists(save_model_path):
         os.makedirs(save_model_path)
+    # else clear directory
+    else:
+        for filename in os.listdir(save_model_path):
+            file_path = os.path.join(save_model_path, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print(e)
     try:
         # Get path for training dataset
         this_file_path = os.path.dirname(os.path.realpath(__file__))

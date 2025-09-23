@@ -25,7 +25,7 @@ class Network:
         self.save_model_path = None
         self.epochs = None
         self.show_epochs = parser_function().show_epochs
-        
+
 
     def feedforward(self, input_data=None):
         """
@@ -98,12 +98,11 @@ class Network:
 
     def update_weights(self):
         """
-        Update the weights and biases of the network using the computed gradients
+        Update the weights of the network using the computed gradients
         """
         for i in range(1, len(self.layers)):
-            # Update the weights and biases of the current layer
+            # Update the weights of the current layer
             self.layers[i].weights -= self.learning_rate * self.gradients[i - 1][0]
-            self.layers[i].bias -= self.learning_rate * self.gradients[i - 1][1]
 
     def fit(self, epochs: int = 1000, learning_rate: float = 0.01):
         """
@@ -165,36 +164,47 @@ class Network:
         for i, layer in enumerate(self.layers[1:], start=1):
             if i == len(self.layers) - 1:  # output layer
                 weights_filename = self.save_model_path + f"/mlp_output_layer_weights.npy"
-                bias_filename = self.save_model_path + f"/mlp_output_layer_bias.npy"
             else:  # hidden layers
                 weights_filename = self.save_model_path + f"/mlp_hidden_layer_{i}_weights.npy"
-                bias_filename = self.save_model_path + f"/mlp_hidden_layer_{i}_bias.npy"
             np.save(weights_filename, layer.weights)
-            np.save(bias_filename, layer.bias)
 
         print("Model saved.")
 
     @staticmethod
-    def load_model(num_layers):
+    def load_model():
         """
         Load the model weights and biases from files
         """
-        this_file_path = os.path.dirname(os.path.realpath(__file__))
-        save_model_path = os.path.join(this_file_path, '..', 'model_save')
-        layers = [Layer(name="input")]
-        for i in range(1, num_layers):
-            if i == num_layers - 1:  # output layer
-                weights_filename = save_model_path + f"/mlp_output_layer_weights.npy"
-                bias_filename = save_model_path + f"/mlp_output_layer_bias.npy"
-                weights = np.load(weights_filename)
-                bias = np.load(bias_filename)
-                layers.append(Layer(weights=weights, bias=bias, activation='softmax'))
-            else:  # hidden layers
-                weights_filename = save_model_path + f"/mlp_hidden_layer_{i}_weights.npy"
-                bias_filename = save_model_path + f"/mlp_hidden_layer_{i}_bias.npy"
-                weights = np.load(weights_filename)
-                bias = np.load(bias_filename)
-                layers.append(Layer(weights=weights, bias=bias, activation='relu'))
+        try: 
+            this_file_path = os.path.dirname(os.path.realpath(__file__))
+            save_model_path = os.path.join(this_file_path, '..', 'model_save')
+            layers = [Layer(name="input")]
+            if not os.path.exists(save_model_path + "/mlp_output_layer_weights.npy"):
+                raise FileNotFoundError("Model files not found. Please train the model first.")
+            num_layers = 1  # start with input layer
+            for filename in os.listdir(save_model_path):
+                if filename.startswith("mlp_hidden_layer_") and filename.endswith("_weights.npy"):
+                    try:
+                        layer_index = int(filename.split("_")[3])
+                        if layer_index + 1 > num_layers:
+                            num_layers = layer_index + 1
+                    except ValueError:
+                        continue
+            num_layers += 1  # add 1 for output layer
 
-        print("Model loaded.")
-        return Network(layers=layers)
+            for i in range(1, num_layers):
+                if i == num_layers - 1:  # output layer
+                    weights_filename = save_model_path + f"/mlp_output_layer_weights.npy"
+                    weights = np.load(weights_filename)
+                    layers.append(Layer(weights=weights, activation='softmax'))
+                else:  # hidden layers
+                    weights_filename = save_model_path + f"/mlp_hidden_layer_{i}_weights.npy"
+                    weights = np.load(weights_filename)
+                    layers.append(Layer(weights=weights, activation='relu'))
+
+            print("Model loaded.")
+            return Network(layers=layers)
+
+        except Exception as e:
+            print(e)
+            return None

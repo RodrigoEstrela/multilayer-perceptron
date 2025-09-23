@@ -23,7 +23,7 @@ def main():
         scaler = joblib.load(save_model_path + '/scaler.pkl')
         X_evaluate = scaler.transform(X_evaluate)
         # Load the model
-        trained_model = Network.load_model(num_layers=5)
+        trained_model = Network.load_model()
         # Evaluate the network
         trained_model.evaluate(input_data=X_evaluate, labels=y_evaluate)
 
