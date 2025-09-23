@@ -52,7 +52,7 @@ You can train the model using two methods.
 
 ### From what is defined in `model/train.py`:
 ```zsh
-python model/train.py --plot_cost --show_epochs
+python3 model/train.py --plot_cost --show_epochs
 ```
 
 - `--plot_cost`: Plot cost evolution after training
@@ -60,7 +60,7 @@ python model/train.py --plot_cost --show_epochs
 
 ### From CLI arguments:
 ```zsh
-python model/train.py --layer 24 24 24 --epochs 100 --learning_rate 0.01
+python3 model/train.py --layer 24 24 24 --epochs 100 --learning_rate 0.01
 ```
 
 - `--layer`: List of hidden layer sizes (e.g., 24 24 24 for three hidden layers)
@@ -75,7 +75,7 @@ Model weights, biases, and scaler are saved in `model_save/`.
 Evaluate the trained model on test data:
 
 ```zsh
-python model/evaluate.py
+python3 model/evaluate.py
 ```
 
 ## Model Architecture
