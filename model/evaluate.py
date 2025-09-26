@@ -24,7 +24,7 @@ def main():
         X_evaluate = scaler.transform(X_evaluate)
         # Load the model
         trained_model = Network.load_model()
-        # Evaluate the network
+        # Evaluate the model
         trained_model.evaluate(input_data=X_evaluate, labels=y_evaluate)
 
     except Exception as e:

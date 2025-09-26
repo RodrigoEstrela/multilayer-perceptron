@@ -3,12 +3,10 @@ import numpy as np
 
 class Layer:
     """
-    Layer class valid for input, hidden and output layers
+    input layer, hidden layers and output layer
     """
 
-    def __init__(self, n_input_nodes: int = None, n_nodes: int = None,
-                 activation: str = None, name: str = None,
-                 weights: np.ndarray = None):
+    def __init__(self, n_input_nodes: int = None, n_nodes: int = None, activation: str = None, name: str = None, weights: np.ndarray = None):
         # Check if the number of nodes in each layer is greater than 0 and less than 300
         if n_nodes is not None and (n_nodes <= 0 or n_nodes > 300):
             raise ValueError("Number of nodes in each layer must be greater than 0 and less than 300.")
@@ -16,11 +14,10 @@ class Layer:
         if n_input_nodes is not None and (n_input_nodes <= 0 or n_input_nodes > 300):
             raise ValueError("Number of input nodes must be greater than 0 and less than 300.")
         
-        self.activation_function = activation
-        self.name = name
-
         self.n_input_nodes = n_input_nodes
         self.n_nodes = n_nodes
+        self.activation_function = activation
+        self.name = name
 
         # Initialize weights and bias
         if weights is not None:
