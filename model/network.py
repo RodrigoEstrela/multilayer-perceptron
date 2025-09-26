@@ -178,6 +178,24 @@ class Network:
         plt.legend()
         plt.show()
 
+    def plot_accuracy(self):
+        """
+        Plot the accuracy evaluation for each epoch with two lines: one for training and one for validation
+        """
+        x = [item[0] for item in self.iterations]
+        y_train = [item[3] for item in self.iterations]
+        y_val = [item[4] for item in self.iterations]
+
+        # Plot the data as a line graph
+        plt.plot(x, y_train, label='Training')
+        plt.plot(x, y_val, label='Validation')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.title('Accuracy evolution')
+        plt.grid(True)
+        plt.legend()
+        plt.show()
+
 
     def save_model(self):
         """
