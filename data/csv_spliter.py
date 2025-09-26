@@ -12,7 +12,7 @@ def spliter(path):
 	y = df.iloc[:, 1]
 	 
 	# Split the dataset
-	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.35, random_state=42)
+	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=42)
 	print(f'train size {len(X_train)}\ntest size {len(X_test)}')
 
 	# Save train and test files

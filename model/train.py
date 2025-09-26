@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
 import joblib
 
 from layer import Layer
@@ -45,6 +46,9 @@ def main():
         save_model_path = os.path.join(this_file_path, '..', 'model_save')
         joblib.dump(scaler, save_model_path + '/scaler.pkl')
 
+        # Divide the dataset into training and validation sets
+        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.20, random_state=42)
+
         if network_from_cli(features=X, labels=y): # this checks if there are sufficient arguments to create the network from CLI
             return
         # Create the network
@@ -58,16 +62,19 @@ def main():
             # ------------------------------------------------------------------------------------
             # Output layer
             Layer(n_input_nodes=24, n_nodes=2, activation='softmax')],
-            features=X, labels=y
+            features_train=X_train, labels_train=y_train, features_val=X_val, labels_val=y_val
         )
 
         if len(network.layers) < 4:
             raise ValueError("At least 2 hidden layers are required.")
-
-        network.fit(epochs=84, learning_rate=0.0314)
+        
+        # Train the model -> Edit here to change the training parameters -----------------
+        network.fit(epochs=70, learning_rate=0.0314)
+        # --------------------------------------------------------------------------------
+        
         network.save_model()
-        if parser_function().plot_cost:
-            network.plot_cost()
+        if parser_function().plot_loss:
+            network.plot_loss()
 
     except Exception as e:
         print(e)
