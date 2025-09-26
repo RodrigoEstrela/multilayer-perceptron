@@ -75,6 +75,8 @@ def main():
         network.save_model()
         if parser_function().plot_loss:
             network.plot_loss()
+        if parser_function().plot_accuracy:
+            network.plot_accuracy()
 
     except Exception as e:
         print(e)

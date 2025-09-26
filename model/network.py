@@ -26,7 +26,8 @@ class Network:
         self.gradients = []
         self.save_model_path = None
         self.epochs = None
-        self.show_epochs = parser_function().show_epochs
+        self.show_metrics = parser_function().show_metrics
+        self.track_accuracy = []
 
 
     def feedforward(self, input_data=None, in_training=True):
@@ -55,30 +56,33 @@ class Network:
             return outputs_list[-1]
 
 
-    def calculate_loss(self, iteration: int):
+    def training_validation_metrics(self, iteration: int):
         """
-        Calculate the loss (error) of the current predictions
+        Compute and print the training and validation metrics for the current iteration
         """
-        # Perform forward pass to get predictions on the training data
-        self.feedforward()
-        # Compute the cross-entropy loss on the training data
-        train_loss = -np.mean(np.log(self.predictions[np.arange(len(self.predictions)), self.labels_train]))
-        
-        # Perform forward pass to get predictions on the validation data
-        val_predictions = self.feedforward(input_data=self.features_val, in_training=False)
-        # Compute the cross-entropy loss on the validation data
-        val_loss = -np.mean(np.log(val_predictions[np.arange(len(val_predictions)), self.labels_val]))
-        
-        # Store the training and validation loss for the current iteration
-        self.iterations.append((iteration, train_loss, val_loss))
+        if self.show_metrics:
+            # Compute the cross-entropy loss on the training data
+            train_loss = -np.mean(np.log(self.predictions[np.arange(len(self.predictions)), self.labels_train]))
+            
+            # Perform forward pass to get predictions on the validation data
+            val_predictions = self.feedforward(input_data=self.features_val, in_training=False)
+            # Compute the cross-entropy loss on the validation data
+            val_loss = -np.mean(np.log(val_predictions[np.arange(len(val_predictions)), self.labels_val]))
+            
+            # Compute the accuracy on the training data
+            train_accuracy = np.mean(np.argmax(self.predictions, axis=1) == self.labels_train)
+            # Compute the accuracy on the validation data
+            val_accuracy = np.mean(np.argmax(val_predictions, axis=1) == self.labels_val)
 
-        # Print the loss metrics for the current epoch
-        if self.show_epochs:
+            # Store the training and validation metrics for the current iteration
+            self.iterations.append((iteration, train_loss, val_loss, train_accuracy, val_accuracy))
+            
             if iteration < 9:
-                print(f"epoch 0{iteration + 1}/{self.epochs} - loss: {train_loss:.2f} - val_loss: {val_loss:.2f}")
+                print(f"epoch 0{iteration + 1}/{self.epochs} - loss: {train_loss:.2f} - val_loss: {val_loss:.2f} - acc: {train_accuracy:.2f} - val_acc: {val_accuracy:.2f}")
             else:
-                print(f"epoch {iteration + 1}/{self.epochs} - loss: {train_loss:.2f} - val_loss: {val_loss:.2f}")
-
+                print(f"epoch {iteration + 1}/{self.epochs} - loss: {train_loss:.2f} - val_loss: {val_loss:.2f} - acc: {train_accuracy:.2f} - val_acc: {val_accuracy:.2f}")
+        else:
+            return
 
     def backpropagation(self):
         """
@@ -135,7 +139,7 @@ class Network:
         print(f"Training on {self.features_train.shape[0]} samples with {self.features_train.shape[1]} features.")
         for i in range(epochs):
             self.feedforward()
-            self.calculate_loss(i)
+            self.training_validation_metrics(i)
             self.backpropagation()
             self.update_weights()
 
