@@ -92,3 +92,7 @@ python3 model/evaluate.py
 
 - This project is part of the 42 Advanced - AI Track Curriculum and as such, it's corresponding subject is propriety of 42 and will not be shared here.
 - The code was developed by myself and it's intended for my personal and student use only.
+
+## Useful Learning Resources
+
+- https://eli.thegreenplace.net/2016/the-softmax-function-and-its-derivative/
