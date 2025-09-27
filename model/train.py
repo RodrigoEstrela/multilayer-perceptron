@@ -49,34 +49,40 @@ def main():
         # Divide the dataset into training and validation sets
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.20, random_state=42)
 
-        if network_from_cli(features=X, labels=y): # this checks if there are sufficient arguments to create the network from CLI
-            return
-        # Create the network
-        network = Network([
-            # Input layer
-            Layer(),
-            # Hidden layers -> Edit here to change the architecture of the network ---------------
-            Layer(n_input_nodes=30, n_nodes=24, activation='relu'),
-            Layer(n_input_nodes=24, n_nodes=24, activation='relu'),
-            Layer(n_input_nodes=24, n_nodes=24, activation='relu'),
-            # ------------------------------------------------------------------------------------
-            # Output layer
-            Layer(n_input_nodes=24, n_nodes=2, activation='softmax')],
-            features_train=X_train, labels_train=y_train, features_val=X_val, labels_val=y_val
-        )
-
-        if len(network.layers) < 4:
+        if network_from_cli(checking=True): # this checks if there are sufficient arguments to create the network from CLI
+            layers, epochs, learning_rate = network_from_cli()
+        else:
+            layers = [
+                # Input layer
+                Layer(),
+                # Hidden layers -> Edit here to change the architecture of the network ---------------
+                Layer(n_input_nodes=30, n_nodes=24, activation='relu'),
+                Layer(n_input_nodes=24, n_nodes=24, activation='relu'),
+                Layer(n_input_nodes=24, n_nodes=24, activation='relu'),
+                # ------------------------------------------------------------------------------------
+                # Output layer
+                Layer(n_input_nodes=24, n_nodes=2, activation='softmax')]
+            epochs = 70  # Edit here to change the number of epochs
+            learning_rate = 0.0314  # Edit here to change the learning rate
+        
+        if len(layers) < 4:
             raise ValueError("At least 2 hidden layers are required.")
         
-        # Train the model -> Edit here to change the training parameters -----------------
-        network.fit(epochs=70, learning_rate=0.0314)
-        # --------------------------------------------------------------------------------
+        network = Network(
+            layers,
+            features_train=X_train,
+            labels_train=y_train,
+            features_val=X_val, 
+            labels_val=y_val
+        )
+        # Train the model 
+        network.fit(epochs=epochs, learning_rate=learning_rate)
         
         network.save_model()
         if parser_function().plot_loss:
-            network.plot_loss()
+            network.plot_metrics(name='loss', metrics_indexes=[1, 2])
         if parser_function().plot_accuracy:
-            network.plot_accuracy()
+            network.plot_metrics(name='accuracy', metrics_indexes=[3, 4])
 
     except Exception as e:
         print(e)

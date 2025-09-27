@@ -3,9 +3,9 @@ from layer import Layer
 from args_parser import parser_function
 
 
-def network_from_cli(features=None, labels=None):
+def network_from_cli(checking=False):
     args = parser_function()
-    if args.layer and args.epochs and args.learning_rate:
+    if args.layer and args.epochs and args.learning_rate and checking:
         # Check if there are at least 2 hidden layers
         if len(args.layer) < 2:
             raise ValueError("At least 2 hidden layers are required.")
@@ -21,27 +21,19 @@ def network_from_cli(features=None, labels=None):
             raise ValueError("Learning rate must be greater than 0.")
         # All checks passed, building network
         print("Building network from cli arguments.")
-
-        # Input layer
-        layers = [Layer.add_layer(type='input', n_nodes=30)]
-        # Hidden layers
-        for i in range(0, len(args.layer)):
-            layers.append(Layer.add_layer(n_input=layers[i].n_nodes, n_nodes=args.layer[i]))
-        # Output layer
-        layers.append(Layer.add_layer(type='output', n_input=layers[-1].n_nodes, n_nodes=2))
-
-        # Create the network and train it
-        network = Network(layers, features=features, labels=labels)
-        network.fit(epochs=args.epochs[0], learning_rate=args.learning_rate[0])
-
-        # Save the model
-        network.save_model()
-        # Plot the cost evolution
-        if args.plot_cost:
-            network.plot_cost()
-
         return True
-    
+
     else:
         print("Network from CLI arguments not found. Building network from file.")
         return False
+    
+    # Input layer
+    layers = [Layer.add_layer(type='input', n_nodes=30)]
+    # Hidden layers
+    for i in range(0, len(args.layer)):
+        layers.append(Layer.add_layer(n_input=layers[i].n_nodes, n_nodes=args.layer[i]))
+    # Output layer
+    layers.append(Layer.add_layer(type='output', n_input=layers[-1].n_nodes, n_nodes=2))
+    
+    return layers, args.epochs[0], args.learning_rate[0]
+    

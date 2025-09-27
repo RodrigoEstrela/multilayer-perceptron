@@ -26,15 +26,15 @@ class Network:
         self.gradients = []
         self.save_model_path = None
         self.epochs = None
-        self.show_metrics = parser_function().show_metrics
+        self.track_metrics = parser_function().show_metrics or parser_function().plot_accuracy or parser_function().plot_loss
         self.track_accuracy = []
+        self.show_metrics = parser_function().show_metrics
 
 
     def feedforward(self, input_data=None, in_training=True):
         """
         Feedforward the input data through the network
         """ 
-
         if in_training:
             self.layers[0].output = self.features_train
             # Iterate over each layer (starting from the second layer)
@@ -60,7 +60,7 @@ class Network:
         """
         Compute and print the training and validation metrics for the current iteration
         """
-        if self.show_metrics:
+        if self.track_metrics:
             # Compute the cross-entropy loss on the training data
             train_loss = -np.mean(np.log(self.predictions[np.arange(len(self.predictions)), self.labels_train]))
             
@@ -76,11 +76,12 @@ class Network:
 
             # Store the training and validation metrics for the current iteration
             self.iterations.append((iteration, train_loss, val_loss, train_accuracy, val_accuracy))
-            
-            if iteration < 9:
-                print(f"epoch 0{iteration + 1}/{self.epochs} - loss: {train_loss:.2f} - val_loss: {val_loss:.2f} - acc: {train_accuracy:.2f} - val_acc: {val_accuracy:.2f}")
-            else:
-                print(f"epoch {iteration + 1}/{self.epochs} - loss: {train_loss:.2f} - val_loss: {val_loss:.2f} - acc: {train_accuracy:.2f} - val_acc: {val_accuracy:.2f}")
+
+            if self.show_metrics:
+                if iteration < 9:
+                    print(f"epoch 0{iteration + 1}/{self.epochs} - loss: {train_loss:.2f} - val_loss: {val_loss:.2f} - acc: {train_accuracy:.2f} - val_acc: {val_accuracy:.2f}")
+                else:
+                    print(f"epoch {iteration + 1}/{self.epochs} - loss: {train_loss:.2f} - val_loss: {val_loss:.2f} - acc: {train_accuracy:.2f} - val_acc: {val_accuracy:.2f}")
         else:
             return
 
@@ -150,7 +151,6 @@ class Network:
         """
         Evaluate the accuracy of the model on the given input data and labels
         """
-
         # Perform prediction on the input data
         predictions_list = self.feedforward(input_data, in_training=False)
         predictions = np.argmax(predictions_list, axis=1)
@@ -160,42 +160,23 @@ class Network:
         print(f"Accuracy: {accuracy:.2f}.")
 
 
-    def plot_loss(self):
+    def plot_metrics(self, name=None, metrics_indexes=None):
         """
-        Plot the loss evaluation for each epoch with two lines: one for training and one for validation
+        Plot the metrics for each epoch with two lines: one for training and one for validation
         """
         x = [item[0] for item in self.iterations]
-        y_train = [item[1] for item in self.iterations]
-        y_val = [item[2] for item in self.iterations]
+        y_train = [item[metrics_indexes[0]] for item in self.iterations]
+        y_val = [item[metrics_indexes[1]] for item in self.iterations]
 
         # Plot the data as a line graph
         plt.plot(x, y_train, label='Training')
         plt.plot(x, y_val, label='Validation')
         plt.xlabel('Epochs')
-        plt.ylabel('Loss')
-        plt.title('Loss evolution')
+        plt.ylabel(f'{name.capitalize()}')
+        plt.title(f'{name.capitalize()} evolution')
         plt.grid(True)
         plt.legend()
         plt.show()
-
-    def plot_accuracy(self):
-        """
-        Plot the accuracy evaluation for each epoch with two lines: one for training and one for validation
-        """
-        x = [item[0] for item in self.iterations]
-        y_train = [item[3] for item in self.iterations]
-        y_val = [item[4] for item in self.iterations]
-
-        # Plot the data as a line graph
-        plt.plot(x, y_train, label='Training')
-        plt.plot(x, y_val, label='Validation')
-        plt.xlabel('Epochs')
-        plt.ylabel('Accuracy')
-        plt.title('Accuracy evolution')
-        plt.grid(True)
-        plt.legend()
-        plt.show()
-
 
     def save_model(self):
         """
