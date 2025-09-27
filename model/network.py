@@ -149,15 +149,32 @@ class Network:
 
     def evaluate(self, input_data, labels):
         """
-        Evaluate the accuracy of the model on the given input data and labels
+        Evaluate the accuracy and binary cross-entropy loss of the model
+        on the given input data and labels.
         """
-        # Perform prediction on the input data
-        predictions_list = self.feedforward(input_data, in_training=False)
-        predictions = np.argmax(predictions_list, axis=1)
-        # Compute the accuracy of the model
-        accuracy = np.mean(predictions == labels)
-        # Print the accuracy
-        print(f"Accuracy: {accuracy:.2f}.")
+        # Perform prediction on the input data (get probabilities)
+        predictions = self.feedforward(input_data, in_training=False)  
+        
+        # If using softmax output with 2 classes, take probability of class 1
+        if predictions.shape[1] == 2:
+            probs = predictions[:, 1]
+        else:
+            # If using sigmoid with single output neuron
+            probs = predictions.flatten()
+
+        # Compute predicted class labels
+        predicted_classes = np.argmax(predictions, axis=1) if predictions.shape[1] > 1 else (probs >= 0.5).astype(int)
+
+        # Compute accuracy
+        accuracy = np.mean(predicted_classes == labels)
+
+        # Compute binary cross entropy
+        eps = 1e-15  # to avoid log(0)
+        probs = np.clip(probs, eps, 1 - eps)
+        bce = -np.mean(labels * np.log(probs) + (1 - labels) * np.log(1 - probs))
+
+        print(f"Accuracy: {accuracy:.2f}, Binary Cross-Entropy: {bce:.4f}")
+        return accuracy, bce
 
 
     def plot_metrics(self, name=None, metrics_indexes=None):
