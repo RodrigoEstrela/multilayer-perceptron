@@ -23,17 +23,18 @@ def network_from_cli(checking=False):
         print("Building network from cli arguments.")
         return True
 
-    else:
+    elif checking:
         print("Network from CLI arguments not found. Building network from file.")
         return False
-    
-    # Input layer
-    layers = [Layer.add_layer(type='input', n_nodes=30)]
-    # Hidden layers
-    for i in range(0, len(args.layer)):
-        layers.append(Layer.add_layer(n_input=layers[i].n_nodes, n_nodes=args.layer[i]))
-    # Output layer
-    layers.append(Layer.add_layer(type='output', n_input=layers[-1].n_nodes, n_nodes=2))
-    
-    return layers, args.epochs[0], args.learning_rate[0]
+
+    else:
+        # Input layer
+        layers = [Layer.add_layer(type='input', n_nodes=30)]
+        # Hidden layers
+        for i in range(0, len(args.layer)):
+            layers.append(Layer.add_layer(n_input=layers[i].n_nodes, n_nodes=args.layer[i]))
+        # Output layer
+        layers.append(Layer.add_layer(type='output', n_input=layers[-1].n_nodes, n_nodes=2))
+        
+        return layers, args.epochs[0], args.learning_rate[0]
     
