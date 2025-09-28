@@ -52,10 +52,11 @@ You can train the model using two methods.
 
 ### From what is defined in `model/train.py`:
 ```zsh
-python3 model/train.py --plot_loss --show_metrics
+python3 model/train.py --plot_loss --plot_accuracy --show_metrics
 ```
 
 - `--plot_loss`: Plot loss evolution after training
+- `--plot_accuracy`: Plot accuracy evolution after training
 - `--show_metrics`: Show loss per epoch
 
 ### From CLI arguments:
@@ -66,7 +67,7 @@ python3 model/train.py --layer 24 24 24 --epochs 100 --learning_rate 0.01
 - `--layer`: List of hidden layer sizes (e.g., 24 24 24 for three hidden layers)
 - `--epochs`: Number of training epochs
 - `--learning_rate`: Learning rate
-- plot_loss and show_metrics can also be used here.
+- plot_loss, plot_accuracy and show_metrics can also be used here.
 
 Model weights, biases, and scaler are saved in `model_save/`.
 
