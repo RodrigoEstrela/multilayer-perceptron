@@ -1,6 +1,7 @@
 # Multilayer Perceptron (MLP)
 
-This project implements a customizable Multilayer Perceptron (MLP) neural network for binary classification tasks, using Python and NumPy. It includes data preprocessing, model training, evaluation, and model saving/loading functionalities.
+This projectś goal is to implement a customizable Multilayer Perceptron (MLP) neural network for binary, using NumPy, Scikit-Learn and Pandas. It includes data preprocessing, model training, evaluation, and model saving/loading functionalities.
+Naturally, it can be trained with a wide range of data. In this case, it is trained with the data from breat cells and the goal is to indetify this cells' features as either Malignant or Benign. As I take great interest in the medical field and programming world crossing this was a good dataset to focus the project on.
 
 ## Project Structure
 
